@@ -18,6 +18,7 @@ import LightDarkProvider from "~/components/providers/light-dark-provider";
 import SessionProvider from "~/components/providers/session-provider";
 import LoadingSpinner from "~/components/ui/loading-spinner";
 import { Toaster } from "~/components/ui/toaster";
+import DefaultThemes from "./_home-and-layout-components/default-themes";
 
 export const metadata = {
   title: "Neffreys Todos",
@@ -32,6 +33,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <body className="custom-scrollbar">
           <TRPCReactProvider>
             <LightDarkProvider>
+              <DefaultThemes />
               <UseOnRender
                 fallback={
                   <div className="absolute flex h-full w-full flex-col items-center justify-center gap-10 bg-cyan-800 text-slate-50">

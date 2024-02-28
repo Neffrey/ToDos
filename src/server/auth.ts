@@ -16,6 +16,7 @@ import {
   createTable,
   users,
   type ColorTheme,
+  type LdTheme,
   type UserRole,
 } from "~/server/db/schema";
 
@@ -31,6 +32,7 @@ declare module "next-auth" {
       id: string;
       role?: UserRole | null;
       colorTheme?: ColorTheme | null;
+      ldTheme?: ColorTheme | null;
       showCompletedTasksDefault?: boolean | null;
     } & DefaultSession["user"];
   }
@@ -41,6 +43,7 @@ declare module "next-auth" {
     image?: string | null;
     role?: UserRole | null;
     colorTheme?: ColorTheme | null;
+    ldTheme?: LdTheme | null;
     showCompletedTasksDefault?: boolean | null;
   }
 }
@@ -67,13 +70,19 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: user.id,
 
-          role: session?.user?.role
+          role: session.user?.role
             ? session.user.role
             : dbUser?.role
               ? dbUser.role
               : null,
 
           colorTheme: session?.user?.colorTheme
+            ? session.user.colorTheme
+            : dbUser?.colorTheme
+              ? dbUser.colorTheme
+              : null,
+
+          ldTheme: session?.user?.colorTheme
             ? session.user.colorTheme
             : dbUser?.colorTheme
               ? dbUser.colorTheme

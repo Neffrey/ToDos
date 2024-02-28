@@ -1,5 +1,5 @@
 // LIBS
-
+import { getServerAuthSession } from "~/server/auth";
 // UTILS
 import { isWithin } from "~/lib/time-compare";
 import { type Task } from "~/server/db/schema";
@@ -11,8 +11,9 @@ import { DataTable } from "./data-table";
 
 // HELPERS
 const getData = async () => {
+  const user = await getServerAuthSession();
+  if (!user?.user) return [];
   return await api.task.getAll.query();
-  // const newdata = await api.task.getAll.query();
 };
 
 // COMP

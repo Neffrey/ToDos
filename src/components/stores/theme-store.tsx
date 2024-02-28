@@ -7,29 +7,29 @@ import { create } from "zustand";
 import { COLOR_THEMES, type ColorTheme } from "~/server/db/schema";
 
 export interface ThemeStoreType {
+  colorTheme: ColorTheme;
+  setColorTheme: (colorTheme: ColorTheme) => void;
   isOpen: boolean;
-  currentTheme: ColorTheme;
-  themeList: ColorTheme[];
-  setCurrentTheme: (current: ColorTheme) => void;
   setIsOpen: (isOpen: boolean) => void;
+  themeList: ColorTheme[];
   toggleDrawer: () => void;
 }
 
 const useThemeStore = create<ThemeStoreType>((set, get) => ({
-  isOpen: false,
-  currentTheme: "galaxy",
-  themeList: [...COLOR_THEMES],
-  setCurrentTheme: (current) => {
+  colorTheme: "galaxy",
+  setColorTheme: (colorTheme) => {
     set(() => ({
-      currentTheme: current,
+      colorTheme,
     }));
-    window.localStorage.setItem("theme", current);
+    window.localStorage.setItem("theme", colorTheme);
   },
+  isOpen: false,
   setIsOpen: (isOpen) => {
     set(() => ({
       isOpen,
     }));
   },
+  themeList: [...COLOR_THEMES],
   toggleDrawer: () => {
     set(() => ({
       isOpen: !get().isOpen,

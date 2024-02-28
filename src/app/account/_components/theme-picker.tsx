@@ -22,9 +22,9 @@ const ThemePicker = () => {
   const { toast } = useToast();
 
   // Color Theme States
-  const currentTheme = useThemeStore((state) => state.currentTheme);
+  const colorTheme = useThemeStore((state) => state.colorTheme);
   const themeList = useThemeStore((state) => state.themeList);
-  const setCurrentTheme = useThemeStore((state) => state.setCurrentTheme);
+  const setColorTheme = useThemeStore((state) => state.setColorTheme);
 
   // Next Themes
   const { theme: ldTheme, setTheme: setLdTheme } = useTheme();
@@ -33,9 +33,9 @@ const ThemePicker = () => {
   useEffect(() => {
     const localTheme = window.localStorage.getItem("theme");
     if (localTheme !== null && themeList.includes(localTheme as ColorTheme)) {
-      setCurrentTheme(localTheme as ColorTheme);
-    } else window.localStorage.setItem("theme", currentTheme);
-  }, [setCurrentTheme, currentTheme, themeList]);
+      setColorTheme(localTheme as ColorTheme);
+    } else window.localStorage.setItem("theme", colorTheme);
+  }, [setColorTheme, colorTheme, themeList]);
 
   const { update: updateSession } = useSession();
 
@@ -55,9 +55,9 @@ const ThemePicker = () => {
   };
 
   const handleDbColorThemeChange = (input: ColorTheme) => {
-    if (input === currentTheme) return;
+    if (input === colorTheme) return;
     window.localStorage.setItem("theme", input);
-    setCurrentTheme(input);
+    setColorTheme(input);
     editUser.mutate({ colorTheme: input });
     void updateSession();
   };
@@ -108,7 +108,7 @@ const ThemePicker = () => {
                 data-act-class="ACTIVECLASS"
                 suppressHydrationWarning
                 className={`overflow-hidden rounded-lg border-4 text-sm lg:text-base ${ldTheme} ${
-                  theme === currentTheme
+                  theme === colorTheme
                     ? "border-primary"
                     : "border-transparent hover:border-primary/70"
                 }`}
@@ -117,7 +117,7 @@ const ThemePicker = () => {
                 <div className="relative h-full w-full cursor-pointer bg-background font-sans text-foreground">
                   {
                     // Star in top left corner on current theme
-                    theme === currentTheme && (
+                    theme === colorTheme && (
                       <div className="absolute left-1 top-1 text-2xl text-primary">
                         <FaStar />
                       </div>

@@ -30,6 +30,9 @@ export const COLOR_THEMES = [
 ] as const;
 export type ColorTheme = (typeof COLOR_THEMES)[number];
 
+export const ldThemes = ["light", "dark"] as const;
+export type LdTheme = (typeof ldThemes)[number];
+
 export const USER_ROLES = ["ADMIN", "USER", "RESTRICTED"] as const;
 export type UserRole = (typeof users.role.enumValues)[number];
 
@@ -58,6 +61,9 @@ export const users = createTable("user", {
   }).default(sql`CURRENT_TIMESTAMP(3)`),
   image: varchar("image", { length: 255 }),
   role: mysqlEnum("role", USER_ROLES).default(USER_ROLES[1]),
+  colorTheme: mysqlEnum("colorTheme", COLOR_THEMES).default(COLOR_THEMES[5]),
+  ldTheme: mysqlEnum("ldTheme", ldThemes).default(ldThemes[1]),
+  showCompletedTasksDefault: boolean("showCompletedTasks").default(false),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
