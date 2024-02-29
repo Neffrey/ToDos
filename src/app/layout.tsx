@@ -18,7 +18,7 @@ import LightDarkProvider from "~/components/providers/light-dark-provider";
 import SessionProvider from "~/components/providers/session-provider";
 import LoadingSpinner from "~/components/ui/loading-spinner";
 import { Toaster } from "~/components/ui/toaster";
-import DefaultThemes from "./_home-and-layout-components/default-themes";
+import DefaultColorTheme from "./_home-and-layout-components/default-color-theme";
 
 export const metadata = {
   title: "Neffreys Todos",
@@ -31,9 +31,10 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
     <SessionProvider>
       <HtmlWrapper>
         <body className="custom-scrollbar">
+          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
           <TRPCReactProvider>
             <LightDarkProvider>
-              <DefaultThemes />
+              <DefaultColorTheme />
               <UseOnRender
                 fallback={
                   <div className="absolute flex h-full w-full flex-col items-center justify-center gap-10 bg-cyan-800 text-slate-50">
@@ -42,9 +43,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
                   </div>
                 }
               >
-                <NextSSRPlugin
-                  routerConfig={extractRouterConfig(ourFileRouter)}
-                />
                 <Header />
                 <main className="flex min-h-screen w-full flex-col">
                   {children}

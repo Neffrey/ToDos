@@ -14,7 +14,7 @@ type Props = {
 
 const HtmlWrapper = ({ children }: Props) => {
   // Color Mode
-  const currentColorTheme = useThemeStore((state) => state.currentTheme);
+  const colorTheme = useThemeStore((state) => state.colorTheme);
   const { theme: LdTheme } = useTheme();
 
   // No SSR for themeChange
@@ -26,7 +26,7 @@ const HtmlWrapper = ({ children }: Props) => {
     <html
       lang="en"
       suppressHydrationWarning
-      data-theme={currentColorTheme}
+      data-theme={colorTheme}
       className={LdTheme}
     >
       {children}

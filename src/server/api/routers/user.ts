@@ -10,7 +10,7 @@ import {
   protectedUserProcedure,
   userProcedure,
 } from "~/server/api/trpc";
-import { users, COLOR_THEMES } from "~/server/db/schema";
+import { users, COLOR_THEMES, ldThemes } from "~/server/db/schema";
 
 export const userRouter = createTRPCRouter({
   get: userProcedure.query(async ({ ctx }) => {
@@ -27,7 +27,7 @@ export const userRouter = createTRPCRouter({
           .optional(),
         image: z.string().url().optional(),
         showCompletedSetting: z.boolean().optional(),
-        ldTheme: z.string().optional(),
+        ldTheme: z.ZodEnum.create(ldThemes).optional(),
         colorTheme: z.ZodEnum.create(COLOR_THEMES).optional(),
       }),
     )
@@ -37,8 +37,11 @@ export const userRouter = createTRPCRouter({
         .set({
           name: input.name ? sanitize.keepSpace(input.name) : undefined,
           image: input.image ? input.image : undefined,
-          // showCompletedTasksDefault: input.showCompletedSetting,
-          // colorTheme: input.colorTheme ? input.colorTheme : undefined,
+          colorTheme: input.colorTheme ? input.colorTheme : undefined,
+          showCompletedTasksDefault: input.showCompletedSetting
+            ? input.showCompletedSetting
+            : undefined,
+          ldTheme: input.ldTheme ? input.ldTheme : undefined,
         })
         .where(eq(users.id, ctx.session.user.id));
     }),

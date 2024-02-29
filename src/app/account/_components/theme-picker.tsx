@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { FaMoon, FaStar, FaSun } from "react-icons/fa";
 
 // UTILS
-import { type ColorTheme } from "~/server/db/schema";
+import { type LdTheme, ldThemes, type ColorTheme } from "~/server/db/schema";
 import { api } from "~/trpc/react";
 
 // COMPONENTS
@@ -50,11 +50,28 @@ const ThemePicker = () => {
     },
   });
 
-  const toggleLdTheme = () => {
-    setLdTheme(ldTheme === "light" ? "dark" : "light");
+  const handleLdThemeChange = (input?: LdTheme) => {
+    if (input === ldTheme) return;
+
+    // Toggle ldTheme
+    if (input === undefined) {
+      // If light theme, set dark theme
+      if (ldTheme === ldThemes[0]) {
+        setLdTheme(ldThemes[1]);
+        editUser.mutate({ ldTheme: ldThemes[1] });
+      } else {
+        setLdTheme(ldThemes[0]);
+        editUser.mutate({ ldTheme: ldThemes[0] });
+      }
+      return;
+    }
+
+    // Set specific ldTheme
+    setLdTheme(input);
+    editUser.mutate({ ldTheme: input });
   };
 
-  const handleDbColorThemeChange = (input: ColorTheme) => {
+  const handleColorThemeChange = (input: ColorTheme) => {
     if (input === colorTheme) return;
     window.localStorage.setItem("theme", input);
     setColorTheme(input);
@@ -73,24 +90,24 @@ const ThemePicker = () => {
       >
         <div
           className="flex cursor-pointer items-center gap-2"
-          onClick={() => setLdTheme("light")}
+          onClick={() => handleLdThemeChange(ldThemes[0])}
         >
           <FaSun />
         </div>
         <div
           className="flex cursor-pointer items-center gap-2"
-          onClick={() => toggleLdTheme()}
+          onClick={() => handleLdThemeChange()}
         >
           <UseOnRender>
             <Switch
-              checked={ldTheme === "dark"}
+              checked={ldTheme === ldThemes[1]}
               className="data-[state=checked]:bg-neutral-foreground data-[state=unchecked]:bg-neutral-foreground"
             />
           </UseOnRender>
         </div>
         <div
           className="flex cursor-pointer place-items-center gap-2"
-          onClick={() => setLdTheme("dark")}
+          onClick={() => handleLdThemeChange(ldThemes[1])}
         >
           <FaMoon />
         </div>
@@ -112,7 +129,7 @@ const ThemePicker = () => {
                     ? "border-primary"
                     : "border-transparent hover:border-primary/70"
                 }`}
-                onClick={() => handleDbColorThemeChange(theme)}
+                onClick={() => handleColorThemeChange(theme)}
               >
                 <div className="relative h-full w-full cursor-pointer bg-background font-sans text-foreground">
                   {
