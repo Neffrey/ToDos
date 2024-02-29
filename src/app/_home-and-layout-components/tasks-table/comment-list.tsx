@@ -15,7 +15,9 @@ const CommentList = ({ className }: { className?: string }) => {
   const { data: session } = useSession();
   const relativeTime = new RelativeTime();
 
-  const comments = useEditTaskFormStore((state) => state.comments).reverse();
+  const comments = [
+    ...useEditTaskFormStore((state) => state.comments),
+  ].reverse();
 
   const isOwnComment = (userId: string | undefined) => {
     if (!session?.user?.id) return false;
