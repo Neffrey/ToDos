@@ -105,6 +105,7 @@ const ProfPicChangeDialog = () => {
             width={130}
             height={130}
             alt={`${session?.user?.name}'s Profile Picture`}
+            priority
           />
           <div
             className={cn(
