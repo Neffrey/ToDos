@@ -244,7 +244,7 @@ export const tcRelations = relations(taskCompletions, ({ one }) => ({
 export type Comment = Prettify<
   InferSqlTable<typeof comments> & {
     task?: Partial<Task>[];
-    user?: Partial<DbUser>[];
+    user?: Partial<DbUser>;
   }
 >;
 export const comments = createTable(
