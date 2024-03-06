@@ -596,21 +596,6 @@
   }
 }
 
-/* @layer components {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 1em;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--accent);
-    outline: 1px solid red;
-  }
-} */
-
 @layer components {
   .custom-scrollbar {
     scrollbar-width: 1em;
