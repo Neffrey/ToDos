@@ -1,11 +1,19 @@
 // LIBS
-import { getServerAuthSession } from "~/server/auth";
+import resolveConfig from "tailwindcss/resolveConfig";
+
 // UTILS
+import { getServerAuthSession } from "~/server/auth";
 import { isWithin } from "~/lib/time-compare";
 import { type Task } from "~/server/db/schema";
+import { api } from "~/trpc/server";
+import twConfig from "../../../../tailwind.config";
+
+// CONSTS
+const twTheme = resolveConfig(twConfig);
+export const screens = twTheme.theme?.screens;
+export type Screens = typeof screens;
 
 // COMPONENTS
-import { api } from "~/trpc/server";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
@@ -46,8 +54,8 @@ const TasksTableController = async () => {
   });
 
   return (
-    <div className="flex w-3/4 flex-col items-center justify-end">
-      <DataTable columns={columns} data={currentData} />
+    <div className="flex w-full flex-col items-center justify-end px-8 xl:w-3/4">
+      <DataTable columns={columns} data={currentData} screens={screens} />
     </div>
   );
 };

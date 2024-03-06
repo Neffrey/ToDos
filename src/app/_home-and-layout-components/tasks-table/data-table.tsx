@@ -8,10 +8,13 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 import { useSession } from "next-auth/react";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 
 // UTILS
 import useEditTaskFormStore from "~/components/stores/edit-task-form-store";
+import { type Screens } from "./table-controller";
+
+import useMediaQuery from "~/components/hooks/use-media-query";
 
 // COMPONENTS
 import EditTaskDialogContent from "~/app/_home-and-layout-components/tasks-table/edit-task-dialog-content";
@@ -29,17 +32,14 @@ import {
 // TYPES
 import { type Task } from "~/server/db/schema";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in type inference
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<Task, TValue>[];
+interface NewDataTableProps {
+  columns: ColumnDef<Task>[];
   data: Task[];
+  screens: Screens;
 }
 
 // COMP
-export const DataTable = <TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) => {
+export const DataTable = ({ columns, data, screens }: NewDataTableProps) => {
   const { data: session } = useSession();
   const [showCompletedTasks, setShowCompletedTasks] = useState(
     session?.user?.showCompletedTasksDefault ? true : false,
@@ -59,10 +59,26 @@ export const DataTable = <TData, TValue>({
     );
   }, [showCompletedTasks, data]);
 
+  const isLg = useMediaQuery(`(min-width: ${screens?.lg})`);
+  const [columnVisibility, setColumnVisibility] = useState({
+    comments: isLg ? true : false,
+    edit: isLg ? true : false,
+  });
+
+  useLayoutEffect(() => {
+    setColumnVisibility({
+      comments: isLg ? true : false,
+      edit: isLg ? true : false,
+    });
+  }, [isLg]);
+
   const table = useReactTable({
     columns,
     data: dataWithCompletedFilter,
     getCoreRowModel: getCoreRowModel(),
+    state: {
+      columnVisibility,
+    },
   });
 
   return (
@@ -77,14 +93,17 @@ export const DataTable = <TData, TValue>({
           />
         </label>
       </div>
-      <div className="w-full rounded-md border">
-        <Table>
+      <div className="w-full overflow-hidden rounded-md border-2 border-solid border-foreground/30">
+        <Table className="">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className="bg-primary text-primary-foreground"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -106,10 +125,11 @@ export const DataTable = <TData, TValue>({
             <EditTaskDialogContent />
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map((row, i) => (
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    className={`${i % 2 === 0 ? "bg-secondary/30" : "bg-secondary/50"} border-foreground/30 hover:bg-secondary`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

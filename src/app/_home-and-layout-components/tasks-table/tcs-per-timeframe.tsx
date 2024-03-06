@@ -23,7 +23,7 @@ const TCsPerTimeframe = ({ task }: Props) => {
       {currentCompletions.some((e) => e.timeframeCompletion === true) ? (
         <FaCheck className="text-primary" />
       ) : (
-        `${currentCompletions.length} / ${task.timesToComplete}`
+        `${currentCompletions.length} / ${task.timesToComplete} per ${task.timeframe.toLowerCase()}`
       )}
     </div>
   );

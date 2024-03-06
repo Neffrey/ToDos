@@ -13,10 +13,11 @@ import { type Task } from "~/server/db/schema";
 // COLUMNS
 export const columns: ColumnDef<Task>[] = [
   {
-    header: () => {
-      return <div className="flex w-[300px] justify-start">Title</div>;
-    },
+    // Title: Screen lg+
     id: "title",
+    header: () => {
+      return <div className="w-full justify-start lg:w-[300px]">Title</div>;
+    },
     cell: ({ row }) => {
       return (
         <DataCell data={row.original} className="flex-grow">
@@ -25,11 +26,11 @@ export const columns: ColumnDef<Task>[] = [
       );
     },
   },
-
   {
-    id: "#",
+    // # of current completions
+    id: "completions",
     header: () => {
-      return <div className="flex justify-center px-2">#</div>;
+      return <div className="justify-center px-2">Completions</div>;
     },
     cell: ({ row }) => {
       return (
@@ -40,31 +41,10 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    id: "per",
-    header: () => {
-      return <div className="flex justify-center px-2">per</div>;
-    },
-    cell: ({ row }) => {
-      return <DataCell data={row.original}>&nbsp;</DataCell>;
-    },
-  },
-  {
-    id: "timeframe",
-    header: () => {
-      return <div className="flex justify-center px-2">Timeframe</div>;
-    },
-    cell: ({ row }) => {
-      return (
-        <DataCell data={row.original} className="min-w-max justify-center">
-          {row.original.timeframe.toLowerCase()}
-        </DataCell>
-      );
-    },
-  },
-  {
+    // Comments: Screen lg+
     id: "comments",
     header: () => {
-      return <div className="flex justify-center px-2">Comments</div>;
+      return <div className="justify-center px-2">Comments</div>;
     },
     cell: ({ row }) => {
       return (
@@ -75,23 +55,25 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
+    // Edit Task: Screen lg+
     id: "edit",
     header: () => {
-      return <div className="flex justify-center px-2">Edit</div>;
+      return <div className="justify-center px-2">Edit</div>;
     },
     cell: ({ row }) => {
       return (
-        <div className="flex justify-center">
+        <div className="justify-center">
           <EditTaskBtn task={row.original} />
         </div>
       );
     },
   },
   {
+    // Mark task complete: all screens
+    id: "complete",
     header: () => {
       return <div className="flex justify-end px-2">Complete</div>;
     },
-    id: "complete",
     cell: ({ row }) => {
       return (
         <CreateCompletionBtn className="justify-end px-4" task={row.original} />
