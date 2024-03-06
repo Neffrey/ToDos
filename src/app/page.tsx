@@ -12,17 +12,18 @@ const Home = async () => {
   return (
     <div
       // HERO ROW
-      className="from-background to-background/50 flex w-full flex-wrap items-center justify-around gap-12 bg-gradient-to-br px-4 py-16 md:justify-center md:px-20"
+      className="flex w-full flex-wrap items-center justify-around gap-12 bg-gradient-to-br from-background to-background/50 md:justify-center "
+      // md:px-20 px-4 py-16
     >
       <div className="flex w-full flex-col gap-5 md:w-1/2 lg:w-1/3">
-        <h1 className="text-foreground w-full text-center text-5xl font-extrabold tracking-wider sm:text-[5rem]">
+        <h1 className="w-full text-center text-5xl font-extrabold tracking-wider text-foreground sm:text-[5rem]">
           nToDos
         </h1>
-        <h2 className="text-foreground w-full text-center text-xl tracking-wider">
+        <h2 className="w-full text-center text-xl tracking-wider text-foreground">
           Just a lil todo app by Neffrey
         </h2>
       </div>
-      <div className="flex w-full items-center justify-center md:w-1/2 lg:w-1/5">
+      <div className="flex w-full items-center justify-center">
         <ProtectedContent
           authedRoles={["ADMIN", "USER"]}
           fallback={<LoginBtn />}
