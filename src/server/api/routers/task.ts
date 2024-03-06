@@ -62,4 +62,16 @@ export const taskRouter = createTRPCRouter({
           and(eq(tasks.id, input.id), eq(tasks.userId, ctx.session.user.id)),
         );
     }),
+  delete: userProcedure
+    .input(z.object({ taskId: z.number().int().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db
+        .delete(tasks)
+        .where(
+          and(
+            eq(tasks.id, input.taskId),
+            eq(tasks.userId, ctx.session.user.id),
+          ),
+        );
+    }),
 });

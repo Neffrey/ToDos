@@ -36,6 +36,7 @@ const EditTaskDialogContent = () => {
     (state) => state.setTaskCompletions,
   );
   const timeframe = useEditTaskFormStore((state) => state.timeframe);
+  const setOpen = useEditTaskFormStore((state) => state.setOpen);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,6 +61,14 @@ const EditTaskDialogContent = () => {
     },
   });
 
+  const deleteTask = api.task.delete.useMutation({
+    onSuccess: () => {
+      // setTaskCompletions(taskCompletions.slice(0, -1));
+      router.refresh();
+      setOpen(false);
+    },
+  });
+
   const handleCreateCompletion = () => {
     createCompletion.mutate({
       taskId: id,
@@ -70,6 +79,12 @@ const EditTaskDialogContent = () => {
 
   const handleDeleteCompletion = () => {
     deleteCompletion.mutate({
+      taskId: id,
+    });
+  };
+
+  const handleDeleteTask = () => {
+    deleteTask.mutate({
       taskId: id,
     });
   };
@@ -97,6 +112,9 @@ const EditTaskDialogContent = () => {
             </Button>
             <Button onClick={handleDeleteCompletion} variant={"destructive"}>
               Unmark Completed
+            </Button>
+            <Button onClick={handleDeleteTask} variant={"destructive"}>
+              Delete Task
             </Button>
           </div>
         </div>
