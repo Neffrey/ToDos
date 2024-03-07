@@ -122,7 +122,7 @@ export const DataTable = ({ columns, data, screens }: NewDataTableProps) => {
             open={open}
             onOpenChange={setOpen}
           >
-            <EditTaskDialogContent />
+            <EditTaskDialogContent screens={screens} />
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row, i) => (

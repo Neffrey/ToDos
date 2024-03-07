@@ -1,42 +1,33 @@
 "use client";
 
-// LIBS
+//LIBS
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { type z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 
 // UTILS
 import { formSchema } from "~/app/_home-and-layout-components/forms/edit-task-form";
-import { api } from "~/trpc/react";
+import useMediaQuery from "~/components/hooks/use-media-query";
 import useEditTaskFormStore from "~/components/stores/edit-task-form-store";
 
 //COMPONENTS
-import { DialogContent } from "~/components/ui/dialog";
-import { Button } from "~/components/ui/button";
 import EditTaskForm from "~/app/_home-and-layout-components/forms/edit-task-form";
-import AddCommentForm from "~/app/_home-and-layout-components/forms/add-comment-form";
-import CommentList from "~/app/_home-and-layout-components/tasks-table/comment-list";
+import { DialogContent } from "~/components/ui/dialog";
 import { Separator } from "~/components/ui/separator";
-import { type TaskCompletion } from "~/server/db/schema";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { type Screens } from "./table-controller";
+import TaskComments from "./task-comments";
+import CompletionActions from "./completion-actions";
 
 // COMP
-const EditTaskDialogContent = () => {
-  const router = useRouter();
+const EditTaskDialogContent = ({ screens }: { screens: Screens }) => {
+  const isLg = useMediaQuery(`(min-width: ${screens?.lg})`);
 
-  const id = useEditTaskFormStore((state) => state.id);
   const title = useEditTaskFormStore((state) => state.title);
   const timesToComplete = useEditTaskFormStore(
     (state) => state.timesToComplete,
   );
-  const taskCompletions = useEditTaskFormStore(
-    (state) => state.taskCompletions,
-  );
-  const setTaskCompletions = useEditTaskFormStore(
-    (state) => state.setTaskCompletions,
-  );
   const timeframe = useEditTaskFormStore((state) => state.timeframe);
-  const setOpen = useEditTaskFormStore((state) => state.setOpen);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,89 +38,47 @@ const EditTaskDialogContent = () => {
     },
   });
 
-  const createCompletion = api.completion.createWithReturn.useMutation({
-    onSuccess: (data) => {
-      setTaskCompletions([...taskCompletions, data as TaskCompletion]);
-      router.refresh();
-    },
-  });
-
-  const deleteCompletion = api.completion.delete.useMutation({
-    onSuccess: () => {
-      setTaskCompletions(taskCompletions.slice(0, -1));
-      router.refresh();
-    },
-  });
-
-  const deleteTask = api.task.delete.useMutation({
-    onSuccess: () => {
-      // setTaskCompletions(taskCompletions.slice(0, -1));
-      router.refresh();
-      setOpen(false);
-    },
-  });
-
-  const handleCreateCompletion = () => {
-    createCompletion.mutate({
-      taskId: id,
-      timeframeCompletion:
-        taskCompletions.length < timesToComplete - 1 ? false : true,
-    });
-  };
-
-  const handleDeleteCompletion = () => {
-    deleteCompletion.mutate({
-      taskId: id,
-    });
-  };
-
-  const handleDeleteTask = () => {
-    deleteTask.mutate({
-      taskId: id,
-    });
-  };
-
   return (
     <DialogContent className="max-h-[90vh] min-h-[90vh] min-w-[90vw] max-w-[90vw] bg-popover">
-      <div className="flex items-center">
-        <div className="flex w-1/2 flex-col">
-          <div className="w-full pb-4 text-center text-lg font-semibold">
-            Edit Task
-          </div>
-          <EditTaskForm form={form} />
-          <div className="flex items-center justify-center">
+      {isLg ? (
+        <div className="flex">
+          <div className="flex w-full flex-col lg:w-1/2">
+            <div className="w-full pb-4 text-center text-lg font-semibold">
+              Edit Task
+            </div>
+            <EditTaskForm form={form} />
             <Separator className="my-8 w-2/3 bg-popover-foreground" />
+            <CompletionActions />
           </div>
-          <p className="w-full text-center">
-            {`${
-              taskCompletions.length
-            } / ${timesToComplete} completions per ${timeframe.toLowerCase()}`}
-          </p>
-          <div className="p-4" />
-          <div className="flex items-center justify-center gap-4">
-            <Button onClick={handleCreateCompletion} variant={"secondary"}>
-              Mark Completed
-            </Button>
-            <Button onClick={handleDeleteCompletion} variant={"destructive"}>
-              Unmark Completed
-            </Button>
-            <Button onClick={handleDeleteTask} variant={"destructive"}>
-              Delete Task
-            </Button>
+          <Separator
+            orientation="vertical"
+            className="m-4 max-h-[95%] -translate-x-full bg-popover-foreground"
+          />
+          <div className="flex w-full flex-col lg:w-1/2">
+            <div className="w-full pb-4 text-center text-lg font-semibold">
+              Comments
+            </div>
+            <TaskComments />
           </div>
         </div>
-        <Separator
-          orientation="vertical"
-          className="m-4 max-h-[95%] -translate-x-full bg-popover-foreground"
-        />
-        <div className="flex w-1/2 flex-col">
-          <div className="w-full pb-4 text-center text-lg font-semibold">
-            Comments
-          </div>
-          <AddCommentForm />
-          <CommentList className="mt-4" />
-        </div>
-      </div>
+      ) : (
+        <Tabs defaultValue="edit">
+          <TabsList>
+            <TabsTrigger value="edit">Edit Task</TabsTrigger>
+            <TabsTrigger value="completions">Completions</TabsTrigger>
+            <TabsTrigger value="comments">Comments</TabsTrigger>
+          </TabsList>
+          <TabsContent value="edit">
+            <EditTaskForm form={form} />
+          </TabsContent>
+          <TabsContent value="completions">
+            <CompletionActions />
+          </TabsContent>
+          <TabsContent value="comments">
+            <TaskComments />
+          </TabsContent>
+        </Tabs>
+      )}
     </DialogContent>
   );
 };

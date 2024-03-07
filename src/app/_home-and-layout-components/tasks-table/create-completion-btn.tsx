@@ -2,6 +2,7 @@
 
 // LIBS
 import { useRouter } from "next/navigation";
+import { FaCheck } from "react-icons/fa";
 
 // UTILS
 import { api } from "~/trpc/react";
@@ -40,7 +41,7 @@ const CreateCompletionBtn = ({ className, task }: Props) => {
   return (
     <div className={cn("flex items-center justify-center", className)}>
       <Button className="min-w-max" onClick={handleCreateCompletion}>
-        Mark Complete
+        <FaCheck className="text" />
       </Button>
     </div>
   );
