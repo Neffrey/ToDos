@@ -13,7 +13,7 @@ export const completionRouter = createTRPCRouter({
   create: userProcedure
     .input(
       z.object({
-        taskId: z.number().min(1),
+        taskId: z.string().min(1),
         timeframeCompletion: z.boolean().default(false).optional(),
       }),
     )
@@ -27,7 +27,7 @@ export const completionRouter = createTRPCRouter({
   createWithReturn: userProcedure
     .input(
       z.object({
-        taskId: z.number().min(1),
+        taskId: z.string().min(1),
         timeframeCompletion: z.boolean().default(false).optional(),
       }),
     )
@@ -44,7 +44,7 @@ export const completionRouter = createTRPCRouter({
   delete: userProcedure
     .input(
       z.object({
-        taskId: z.number().min(1),
+        taskId: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {

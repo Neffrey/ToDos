@@ -12,7 +12,7 @@ export const commentRouter = createTRPCRouter({
   getAllWhereTaskId: userProcedure
     .input(
       z.object({
-        taskId: z.number().min(1),
+        taskId: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -23,7 +23,7 @@ export const commentRouter = createTRPCRouter({
   create: userProcedure
     .input(
       z.object({
-        taskId: z.number().min(1),
+        taskId: z.string().min(1),
         content: z.string().min(1),
       }),
     )
@@ -42,7 +42,7 @@ export const commentRouter = createTRPCRouter({
   delete: userProcedure
     .input(
       z.object({
-        taskId: z.number().min(1),
+        taskId: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -58,7 +58,7 @@ export const commentRouter = createTRPCRouter({
   edit: userProcedure
     .input(
       z.object({
-        taskId: z.number().int().min(1),
+        taskId: z.string().min(1),
         content: z.string().min(1),
       }),
     )

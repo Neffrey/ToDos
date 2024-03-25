@@ -43,7 +43,7 @@ export const taskRouter = createTRPCRouter({
   edit: userProcedure
     .input(
       z.object({
-        id: z.number().int().min(1),
+        id: z.string().min(1),
         title: z.string().min(1).optional(),
         timesToComplete: z.number().int().min(1).optional(),
         timeframe: z.enum(TASK_TIMEFRAMES).optional(),
@@ -63,7 +63,7 @@ export const taskRouter = createTRPCRouter({
         );
     }),
   delete: userProcedure
-    .input(z.object({ taskId: z.number().int().min(1) }))
+    .input(z.object({ taskId: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       return await ctx.db
         .delete(tasks)

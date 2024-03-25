@@ -16,8 +16,8 @@ import {
 export interface EditTaskFormStoreType {
   open: boolean;
   setOpen: (open: boolean) => void;
-  id: number;
-  setId: (id: number) => void;
+  id: string;
+  setId: (id: string) => void;
   title: string;
   setTitle: (title: string) => void;
   timesToComplete: number;
@@ -36,7 +36,7 @@ const useEditTaskFormStore = create<EditTaskFormStoreType>((set) => ({
     set(() => ({
       open,
     })),
-  id: 0,
+  id: "",
   setId: (id) =>
     set(() => ({
       id,

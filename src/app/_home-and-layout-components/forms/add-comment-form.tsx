@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import useEditTaskFormStore from "~/components/stores/edit-task-form-store";
 import { cn } from "~/lib/utils";
 import { api } from "~/trpc/react";
-import { type Comment } from "~/server/db/schema";
 
 // COMPONENTS
 import { Button } from "~/components/ui/button";
@@ -29,7 +28,7 @@ const AddCommentForm = ({ className }: { className?: string }) => {
       console.log("create comment success - data: ", data);
       toast({ title: "Comment created." });
       setNewCommentInput("");
-      setComments(data satisfies Partial<Comment>[]);
+      setComments(data);
       router.refresh();
     },
     onError: (error) => {
