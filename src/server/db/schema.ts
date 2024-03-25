@@ -1,18 +1,14 @@
 // LIBS
 import { relations, sql } from "drizzle-orm";
 import {
-  bigint,
-  boolean,
-  index,
-  int,
-  mysqlEnum,
-  mysqlTableCreator,
-  primaryKey,
   text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/mysql-core";
+  integer,
+  sqliteTable,
+  primaryKey,
+  index,
+} from "drizzle-orm/sqlite-core";
 import { type AdapterAccount } from "next-auth/adapters";
+// import { nanoid } from "nanoid/non-secure";
 
 // UTILS
 import { type InferSqlTable, type Prettify } from "~/lib/type-utils";
@@ -39,9 +35,6 @@ export type UserRole = (typeof users.role.enumValues)[number];
 export const TASK_TIMEFRAMES = ["DAY", "WEEK", "FORTNIGHT", "MONTH"] as const;
 export type TaskTimeframe = (typeof tasks.timeframe.enumValues)[number];
 
-// INSTANTIATE SCHEMA
-export const createTable = mysqlTableCreator((name) => `todos_${name}`);
-
 // User & Auth tables
 export type DbUser = Prettify<
   InferSqlTable<typeof users> & {
@@ -51,19 +44,23 @@ export type DbUser = Prettify<
     profilePictures?: ProfilePicture[];
   }
 >;
-export const users = createTable("user", {
-  id: varchar("id", { length: 255 }).notNull().primaryKey(),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("emailVerified", {
-    mode: "date",
-    fsp: 3,
-  }).default(sql`CURRENT_TIMESTAMP(3)`),
-  image: varchar("image", { length: 255 }),
-  role: mysqlEnum("role", USER_ROLES).default(USER_ROLES[1]),
-  colorTheme: mysqlEnum("colorTheme", COLOR_THEMES).default(COLOR_THEMES[5]),
-  ldTheme: mysqlEnum("ldTheme", ldThemes).default(ldThemes[1]),
-  showCompletedTasksDefault: boolean("showCompletedTasks").default(false),
+export const users = sqliteTable("user", {
+  id: text("id").notNull().primaryKey(),
+  // id: text("id").notNull().primaryKey().default(nanoid(12)),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  emailVerified: integer("emailVerified", { mode: "timestamp" }).default(
+    sql`CURRENT_TIMESTAMP`,
+  ),
+  image: text("image"),
+  role: text("role", { enum: USER_ROLES }).default(USER_ROLES[1]),
+  colorTheme: text("colorTheme", { enum: COLOR_THEMES }).default(
+    COLOR_THEMES[5],
+  ),
+  ldTheme: text("ldTheme", { enum: ldThemes }).default(ldThemes[1]),
+  showCompletedTasksDefault: integer("showCompletedTasks", {
+    mode: "boolean",
+  }).default(false),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -75,22 +72,20 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export type Account = Prettify<InferSqlTable<typeof accounts>>;
-export const accounts = createTable(
+export const accounts = sqliteTable(
   "account",
   {
-    userId: varchar("userId", { length: 255 }).notNull(),
-    type: varchar("type", { length: 255 })
-      .$type<AdapterAccount["type"]>()
-      .notNull(),
-    provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
+    userId: text("userId").notNull(),
+    type: text("type").$type<AdapterAccount["type"]>().notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("providerAccountId").notNull(),
     refresh_token: text("refresh_token"),
     access_token: text("access_token"),
-    expires_at: int("expires_at"),
-    token_type: varchar("token_type", { length: 255 }),
-    scope: varchar("scope", { length: 255 }),
+    expires_at: integer("expires_at", { mode: "timestamp_ms" }),
+    token_type: text("token_type"),
+    scope: text("scope"),
     id_token: text("id_token"),
-    session_state: varchar("session_state", { length: 255 }),
+    session_state: text("session_state"),
   },
   (account) => ({
     compoundKey: primaryKey({
@@ -104,14 +99,13 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }));
 
-export const sessions = createTable(
+export const sessions = sqliteTable(
   "session",
   {
-    sessionToken: varchar("sessionToken", { length: 255 })
-      .notNull()
-      .primaryKey(),
-    userId: varchar("userId", { length: 255 }).notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
+    sessionToken: text("sessionToken").notNull().primaryKey(),
+    // sessionToken: text("sessionToken").notNull().primaryKey().default(nanoid()),
+    userId: text("userId").notNull(),
+    expires: text("expires").notNull(),
   },
   (session) => ({
     userIdIdx: index("session_userId_idx").on(session.userId),
@@ -122,12 +116,12 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
-export const verificationTokens = createTable(
+export const verificationTokens = sqliteTable(
   "verificationToken",
   {
-    identifier: varchar("identifier", { length: 255 }).notNull(),
-    token: varchar("token", { length: 255 }).notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: text("expires").notNull(),
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
@@ -140,13 +134,14 @@ export type ProfilePicture = Prettify<
     user?: DbUser[];
   }
 >;
-export const profilePictures = createTable(
+export const profilePictures = sqliteTable(
   "profilePicture",
   {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    userId: varchar("userId", { length: 255 }).notNull(),
-    url: varchar("url", { length: 255 }).notNull(),
-    createdAt: timestamp("created_at")
+    id: text("id").primaryKey(),
+    // id: text("id").primaryKey().default(nanoid(12)),
+    userId: text("userId").notNull(),
+    url: text("url").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
@@ -172,22 +167,23 @@ export type Task = Prettify<
     taskCompletions?: TaskCompletion[];
   }
 >;
-export const tasks = createTable(
+export const tasks = sqliteTable(
   "task",
   {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    title: varchar("title", { length: 256 }).notNull(),
-    userId: varchar("user", { length: 255 }).notNull(),
-    timesToComplete: int("timesToComplete").default(1).notNull(),
-    timeframe: mysqlEnum("timeframe", TASK_TIMEFRAMES)
+    id: text("id").primaryKey(),
+    // id: text("id").primaryKey().default(nanoid(12)),
+    title: text("title").notNull(),
+    userId: text("user").notNull(),
+    timesToComplete: integer("timesToComplete").default(1).notNull(),
+    timeframe: text("timeframe", { enum: TASK_TIMEFRAMES })
       .default(TASK_TIMEFRAMES[0])
       .notNull(),
-    createdAt: timestamp("created_at")
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp("updatedAt")
+    updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
       .default(sql`CURRENT_TIMESTAMP`)
-      .onUpdateNow()
+      // .onUpdateNow()
       .notNull(),
   },
   (task) => ({
@@ -208,21 +204,23 @@ export type TaskCompletion = Prettify<
     user?: Partial<DbUser>[];
   }
 >;
-export const taskCompletions = createTable(
+export const taskCompletions = sqliteTable(
   "taskCompletion",
   {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    taskId: bigint("taskId", { mode: "number" }).notNull(),
-    userId: varchar("user", { length: 255 }).notNull(),
-    timeframeCompletion: boolean("timeframeCompletion")
+    // id: text("id").primaryKey().default(nanoid(12)),
+    // taskId: text("taskId").default(nanoid(12)),
+    id: text("id").primaryKey(),
+    taskId: text("taskId"),
+    userId: text("user").notNull(),
+    timeframeCompletion: integer("timeframeCompletion", { mode: "boolean" })
       .default(false)
       .notNull(),
-    createdAt: timestamp("created_at")
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp("updatedAt")
+    updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
       .default(sql`CURRENT_TIMESTAMP`)
-      .onUpdateNow()
+      // .onUpdateNow()
       .notNull(),
   },
   (taskCompletion) => ({
@@ -247,19 +245,21 @@ export type Comment = Prettify<
     user?: Partial<DbUser>;
   }
 >;
-export const comments = createTable(
+export const comments = sqliteTable(
   "comment",
   {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    taskId: bigint("taskId", { mode: "number" }).notNull(),
-    userId: varchar("user", { length: 255 }).notNull(),
+    // id: text("id").primaryKey().default(nanoid(12)),
+    // taskId: text("taskId").notNull().default(nanoid(12)),
+    id: text("id").primaryKey(),
+    taskId: text("taskId").notNull(),
+    userId: text("user").notNull(),
     content: text("content").notNull(),
-    createdAt: timestamp("created_at")
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp("updatedAt")
+    updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
       .default(sql`CURRENT_TIMESTAMP`)
-      .onUpdateNow()
+      // .onUpdateNow()
       .notNull(),
   },
   (comment) => ({

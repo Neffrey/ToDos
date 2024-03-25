@@ -13,7 +13,6 @@ import GoogleProvider from "next-auth/providers/google";
 import { env } from "~/env";
 import { db } from "~/server/db";
 import {
-  createTable,
   users,
   type ColorTheme,
   type LdTheme,
@@ -32,7 +31,7 @@ declare module "next-auth" {
       id: string;
       role?: UserRole | null;
       colorTheme?: ColorTheme | null;
-      ldTheme?: ColorTheme | null;
+      ldTheme?: LdTheme | null;
       showCompletedTasksDefault?: boolean | null;
     } & DefaultSession["user"];
   }
@@ -58,11 +57,11 @@ export const authOptions: NextAuthOptions = {
     session: async ({ session, user }) => {
       let dbUser;
 
-      if (!user.colorTheme || !user.role || !user.showCompletedTasksDefault) {
-        dbUser = await db.query.users.findFirst({
-          where: eq(users.id, user.id),
-        });
-      }
+      // if (!user.colorTheme || !user.role || !user.showCompletedTasksDefault) {
+      //   dbUser = await db.query.users.findFirst({
+      //     where: eq(users.id, user.id),
+      //   });
+      // }
 
       return {
         ...session,
@@ -70,35 +69,35 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: user.id,
 
-          role: session.user?.role
-            ? session.user.role
-            : dbUser?.role
-              ? dbUser.role
-              : null,
+          // role: session.user?.role
+          //   ? session.user.role
+          //   : dbUser?.role
+          //     ? dbUser.role
+          //     : null,
 
-          colorTheme: session?.user?.colorTheme
-            ? session.user.colorTheme
-            : dbUser?.colorTheme
-              ? dbUser.colorTheme
-              : null,
+          // colorTheme: session?.user?.colorTheme
+          //   ? session.user.colorTheme
+          //   : dbUser?.colorTheme
+          //     ? dbUser.colorTheme
+          //     : null,
 
-          ldTheme: session?.user?.colorTheme
-            ? session.user.colorTheme
-            : dbUser?.colorTheme
-              ? dbUser.colorTheme
-              : null,
+          // ldTheme: session?.user?.colorTheme
+          //   ? session.user.colorTheme
+          //   : dbUser?.colorTheme
+          //     ? dbUser.colorTheme
+          //     : null,
 
-          showCompletedTasksDefault: session?.user?.showCompletedTasksDefault
-            ? session.user.showCompletedTasksDefault
-            : dbUser?.showCompletedTasksDefault
-              ? dbUser.showCompletedTasksDefault
-              : null,
+          // showCompletedTasksDefault: session?.user?.showCompletedTasksDefault
+          //   ? session.user.showCompletedTasksDefault
+          //   : dbUser?.showCompletedTasksDefault
+          //     ? dbUser.showCompletedTasksDefault
+          //     : null,
         },
       };
     },
   },
 
-  adapter: DrizzleAdapter(db, createTable) as Adapter,
+  adapter: DrizzleAdapter(db) as Adapter,
   providers: [
     GoogleProvider({
       clientId: env.GOOGLE_ID ? env.GOOGLE_ID : "",

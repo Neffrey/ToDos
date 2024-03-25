@@ -4,9 +4,10 @@ import { env } from "~/env";
 
 export default {
   schema: "./src/server/db/schema.ts",
-  driver: "mysql2",
+  driver: "turso",
   dbCredentials: {
-    uri: env.DATABASE_URL,
+    url: env.DATABASE_URL,
+    authToken: env.DATABASE_TOKEN,
   },
-  tablesFilter: ["todos_*"],
+  out: "./db-out",
 } satisfies Config;

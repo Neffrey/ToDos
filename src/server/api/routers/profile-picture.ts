@@ -28,7 +28,7 @@ export const profilePicturesRouter = createTRPCRouter({
   delete: userProcedure
     .input(
       z.object({
-        id: z.number().min(1),
+        id: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
