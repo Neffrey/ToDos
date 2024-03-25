@@ -1,5 +1,3 @@
-"use server";
-
 // LIBS
 import Link from "next/link";
 

@@ -54,14 +54,14 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: async ({ session, user }) => {
-      let dbUser;
+    session: ({ session, user }) => {
+      // let dbUser;
 
-      if (!user.colorTheme || !user.role || !user.showCompletedTasksDefault) {
-        dbUser = await db.query.users.findFirst({
-          where: eq(users.id, user.id),
-        });
-      }
+      // if (!user.colorTheme || !user.role || !user.showCompletedTasksDefault) {
+      //   dbUser = await db.query.users.findFirst({
+      //     where: eq(users.id, user.id),
+      //   });
+      // }
 
       return {
         ...session,
@@ -69,29 +69,29 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: user.id,
 
-          role: session.user?.role
-            ? session.user.role
-            : dbUser?.role
-              ? dbUser.role
-              : null,
+          // role: session.user?.role
+          //   ? session.user.role
+          //   : dbUser?.role
+          //     ? dbUser.role
+          //     : null,
 
-          colorTheme: session?.user?.colorTheme
-            ? session.user.colorTheme
-            : dbUser?.colorTheme
-              ? dbUser.colorTheme
-              : null,
+          // colorTheme: session?.user?.colorTheme
+          //   ? session.user.colorTheme
+          //   : dbUser?.colorTheme
+          //     ? dbUser.colorTheme
+          //     : null,
 
-          ldTheme: session?.user?.colorTheme
-            ? session.user.colorTheme
-            : dbUser?.colorTheme
-              ? dbUser.colorTheme
-              : null,
+          // ldTheme: session?.user?.colorTheme
+          //   ? session.user.colorTheme
+          //   : dbUser?.colorTheme
+          //     ? dbUser.colorTheme
+          //     : null,
 
-          showCompletedTasksDefault: session?.user?.showCompletedTasksDefault
-            ? session.user.showCompletedTasksDefault
-            : dbUser?.showCompletedTasksDefault
-              ? dbUser.showCompletedTasksDefault
-              : null,
+          // showCompletedTasksDefault: session?.user?.showCompletedTasksDefault
+          //   ? session.user.showCompletedTasksDefault
+          //   : dbUser?.showCompletedTasksDefault
+          //     ? dbUser.showCompletedTasksDefault
+          //     : null,
         },
       };
     },
