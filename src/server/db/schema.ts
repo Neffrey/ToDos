@@ -45,11 +45,11 @@ export type DbUser = Prettify<
   }
 >;
 export const users = sqliteTable("user", {
-  // id: text("id").notNull().primaryKey(),
-  id: text("id")
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => nanoid(12)),
+  id: text("id").notNull().primaryKey(),
+  // id: text("id")
+  //   .notNull()
+  //   .primaryKey()
+  //   .$defaultFn(() => nanoid(12)),
   name: text("name").notNull(),
   email: text("email").notNull(),
   emailVerified: integer("emailVerified", { mode: "timestamp" }).default(
@@ -105,11 +105,11 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const sessions = sqliteTable(
   "session",
   {
-    // sessionToken: text("sessionToken").notNull().primaryKey(),
-    sessionToken: text("sessionToken")
-      .notNull()
-      .primaryKey()
-      .$defaultFn(() => nanoid()),
+    sessionToken: text("sessionToken").notNull().primaryKey(),
+    // sessionToken: text("sessionToken")
+    //   .notNull()
+    //   .primaryKey()
+    //   .$defaultFn(() => nanoid()),
     userId: text("userId").notNull(),
     expires: text("expires").notNull(),
   },
