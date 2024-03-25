@@ -8,7 +8,7 @@ import {
   index,
 } from "drizzle-orm/sqlite-core";
 import { type AdapterAccount } from "next-auth/adapters";
-// import { nanoid } from "nanoid/non-secure";
+import { nanoid } from "nanoid/non-secure";
 
 // UTILS
 import { type InferSqlTable, type Prettify } from "~/lib/type-utils";
@@ -45,8 +45,8 @@ export type DbUser = Prettify<
   }
 >;
 export const users = sqliteTable("user", {
-  id: text("id").notNull().primaryKey(),
-  // id: text("id").notNull().primaryKey().default(nanoid(12)),
+  // id: text("id").notNull().primaryKey(),
+  id: text("id").notNull().primaryKey().default(nanoid(12)),
   name: text("name").notNull(),
   email: text("email").notNull(),
   emailVerified: integer("emailVerified", { mode: "timestamp" }).default(
@@ -102,8 +102,8 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const sessions = sqliteTable(
   "session",
   {
-    sessionToken: text("sessionToken").notNull().primaryKey(),
-    // sessionToken: text("sessionToken").notNull().primaryKey().default(nanoid()),
+    // sessionToken: text("sessionToken").notNull().primaryKey(),
+    sessionToken: text("sessionToken").notNull().primaryKey().default(nanoid()),
     userId: text("userId").notNull(),
     expires: text("expires").notNull(),
   },
@@ -137,8 +137,8 @@ export type ProfilePicture = Prettify<
 export const profilePictures = sqliteTable(
   "profilePicture",
   {
-    id: text("id").primaryKey(),
-    // id: text("id").primaryKey().default(nanoid(12)),
+    // id: text("id").primaryKey(),
+    id: text("id").primaryKey().default(nanoid(12)),
     userId: text("userId").notNull(),
     url: text("url").notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -170,8 +170,8 @@ export type Task = Prettify<
 export const tasks = sqliteTable(
   "task",
   {
-    id: text("id").primaryKey(),
-    // id: text("id").primaryKey().default(nanoid(12)),
+    // id: text("id").primaryKey(),
+    id: text("id").primaryKey().default(nanoid(12)),
     title: text("title").notNull(),
     userId: text("user").notNull(),
     timesToComplete: integer("timesToComplete").default(1).notNull(),
@@ -207,10 +207,10 @@ export type TaskCompletion = Prettify<
 export const taskCompletions = sqliteTable(
   "taskCompletion",
   {
-    // id: text("id").primaryKey().default(nanoid(12)),
-    // taskId: text("taskId").default(nanoid(12)),
-    id: text("id").primaryKey(),
-    taskId: text("taskId"),
+    id: text("id").primaryKey().default(nanoid(12)),
+    taskId: text("taskId").default(nanoid(12)),
+    // id: text("id").primaryKey(),
+    // taskId: text("taskId"),
     userId: text("user").notNull(),
     timeframeCompletion: integer("timeframeCompletion", { mode: "boolean" })
       .default(false)
@@ -248,10 +248,10 @@ export type Comment = Prettify<
 export const comments = sqliteTable(
   "comment",
   {
-    // id: text("id").primaryKey().default(nanoid(12)),
-    // taskId: text("taskId").notNull().default(nanoid(12)),
-    id: text("id").primaryKey(),
-    taskId: text("taskId").notNull(),
+    id: text("id").primaryKey().default(nanoid(12)),
+    taskId: text("taskId").notNull().default(nanoid(12)),
+    // id: text("id").primaryKey(),
+    // taskId: text("taskId").notNull(),
     userId: text("user").notNull(),
     content: text("content").notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
