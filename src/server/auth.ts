@@ -5,11 +5,14 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
+import { eq } from "drizzle-orm";
 import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
 import { createTable } from "~/server/db/schema";
+import { users } from "~/server/db/schema";
+import type { ColorTheme, LdTheme, UserRole } from "~/server/db/schema";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -21,15 +24,22 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      role?: UserRole | null;
+      colorTheme?: ColorTheme | null;
+      ldTheme?: LdTheme | null;
+      showCompletedTasksDefault?: boolean | null;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  export interface User {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role?: UserRole | null;
+    colorTheme?: ColorTheme | null;
+    ldTheme?: LdTheme | null;
+    showCompletedTasksDefault?: boolean | null;
+  }
 }
 
 /**
@@ -39,13 +49,47 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, user }) => {
+      let dbUser;
+
+      if (!user.colorTheme || !user.role || !user.showCompletedTasksDefault) {
+        dbUser = await db.query.users.findFirst({
+          where: eq(users.id, user.id),
+        });
+      }
+
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+
+          role: session.user?.role
+            ? session.user.role
+            : dbUser?.role
+              ? dbUser.role
+              : null,
+
+          colorTheme: session?.user?.colorTheme
+            ? session.user.colorTheme
+            : dbUser?.colorTheme
+              ? dbUser.colorTheme
+              : null,
+
+          ldTheme: session?.user?.colorTheme
+            ? session.user.colorTheme
+            : dbUser?.colorTheme
+              ? dbUser.colorTheme
+              : null,
+
+          showCompletedTasksDefault: session?.user?.showCompletedTasksDefault
+            ? session.user.showCompletedTasksDefault
+            : dbUser?.showCompletedTasksDefault
+              ? dbUser.showCompletedTasksDefault
+              : null,
+        },
+      };
+    },
   },
   adapter: DrizzleAdapter(db, createTable) as Adapter,
   providers: [
