@@ -21,7 +21,10 @@ const ProtectedContent = ({
   const { data: session } = useSession();
 
   const checkRoles = () => {
-    if (!authedRoles) return true;
+    if (!authedRoles) {
+      if (session) return true;
+      return false;
+    }
     if (session?.user?.role) {
       return authedRoles.includes(session.user.role);
     }

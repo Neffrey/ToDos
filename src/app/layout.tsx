@@ -1,5 +1,7 @@
 import "~/styles/globals.css";
 
+import SessionProvider from "~/components/providers/session-provider";
+
 export const metadata = {
   title: "Neffreys Todos",
   description: "Just a quick lil todo app",
@@ -12,8 +14,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <SessionProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </SessionProvider>
   );
 }
